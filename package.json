@@ -1,0 +1,21 @@
+{
+  "name": "xvideos-boss-mode",
+  "version": "1.0.0",
+  "main": "xvideos-boss-mode.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KumInside/xvideos-boss-mode.git"
+  },
+  "keywords": [
+    "xvideos",
+    "boss-mode"
+  ],
+  "author": "Kuminside",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KumInside/xvideos-boss-mode/issues"
+  },
+  "homepage": "https://github.com/KumInside/xvideos-boss-mode#readme",
+  "description": "Boss mode for xvideos.com. Copy the code into your browser console to enable."
+}
