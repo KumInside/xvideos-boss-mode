@@ -1,10 +1,10 @@
 (() => {
 	const globalStyle = `
-    body:not(.normal) { --shadow-bg: rgba(255,255,255,0.98); --hole-x: -500%; --hole-y: -500%; --mask-size: 0px; --fake-content: ""; --shadow-filter: blur(10px); }
+    body:not(.normal) { --shadow-bg: rgba(255,255,255,0.98); --hole-x: -500%; --hole-y: -500%; --mask-size: 0px; --fake-content: ""; --shadow-filter: blur(10px); --clipped-area-opacity: 50%; }
     body:not(.normal)::after { content: var(--fake-content); display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--shadow-bg); z-index: 99999999; pointer-events: none; overflow: hidden; mask-image: radial-gradient(circle var(--mask-size) at var(--hole-x) var(--hole-y), #ffffff00 10%, #ffffffff 100%); mask-repeat: no-repeat; mask-composite: exclude; backdrop-filter: var(--shadow-filter); transition all 0.2s; }
     body.mask::after { }
     body.clip::after { clip-path: var(--clipped-area); }
-    body.clip #html5video { filter: contrast(50%) opacity(50%); }
+    body.clip #html5video { filter: contrast(var(--clipped-area-opacity)) opacity(var(--clipped-area-opacity)); }
     body.mask img { user-drag: none; -webkit-user-drag: none; }
   `;
 	const ClickStrategy = Object.freeze({
@@ -26,6 +26,8 @@
 	const DEFAULT_MASK_SIZE = 0;
 	const DEFAULT_MASK_OPACITY = 0.98;
 	const DEFAULT_MASK_MODE = 0;
+	const DEFAULT_CLIP_OPACITY = 0.5;
+	const MASK_MODE_CLIP = 1;
 
 	function bindEvent(ctx, name, callback, ...otherArgs) {
 		if (!ctx) {
@@ -73,6 +75,7 @@
 	let maskModeIndex = DEFAULT_MASK_MODE,
 		maskSize = DEFAULT_MASK_SIZE,
 		maskOpacity = DEFAULT_MASK_OPACITY,
+		clipOpacity = DEFAULT_CLIP_OPACITY,
 		// 鼠标移出等特殊情况下 forceMask 是 true，此时临时重置。
 		forceMask = false,
 		showHowTo = true;
@@ -86,6 +89,7 @@
 				switch (cls) {
 					case "clip":
 						el.style.setProperty("--clipped-area", generateCurrentClipPath());
+						el.style.setProperty("--clipped-area-opacity", `${clipOpacity * 100}%`);
 					default:
 						el.style.setProperty("--mask-size", `${forceMask ? DEFAULT_MASK_MODE : maskSize}px`);
 						el.style.setProperty("--shadow-bg", forceMask ? "#fff" : `rgba(255,255,255,${maskOpacity})`);
@@ -121,6 +125,11 @@
 
 	function setMaskOpacity(el, delta, forceValue) {
 		maskOpacity = typeof forceValue === "number" ? forceValue : typeof delta === "number" ? Math.min(Math.max(maskOpacity + delta, 0), 1) : 0;
+		updateMaskStyles(el);
+	}
+
+	function setClipOpacity(el, delta, forceValue) {
+		clipOpacity = typeof forceValue === "number" ? forceValue : typeof delta === "number" ? Math.min(Math.max(clipOpacity + delta, 0), 1) : 0;
 		updateMaskStyles(el);
 	}
 
@@ -206,7 +215,11 @@
 			if (altKey || (depth <= 3 && x < width / 3)) {
 				preventEventDefault(e);
 				updateMousePosition(body, e);
-				setMaskSize(body, deltaY);
+				if (maskModeIndex === DEFAULT_MASK_MODE) {
+					setMaskSize(body, deltaY);
+				} else if (maskModeIndex === MASK_MODE_CLIP) {
+					setClipOpacity(body, deltaY > 0 ? 0.02 : deltaY < 0 ? -0.02 : 0);
+				}
 			} else if (ctrlKey || (depth <= 3 && x > (width * 2) / 3)) {
 				preventEventDefault(e);
 				updateMousePosition(body, e);
