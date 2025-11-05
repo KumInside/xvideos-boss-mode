@@ -1,4 +1,5 @@
 (() => {
+	const videoID = location.hostname.includes("xvideos.com") ? "#html5video" : location.hostname.includes("jav-official.com") ? "#vjs_video_3" : undefined;
 	const globalStyle = `
     body:not(.normal) { --shadow-bg: rgba(255,255,255,0.98); --hole-x: -500%; --hole-y: -500%; --mask-size: 0px; --fake-content: ""; --shadow-filter: blur(10px); --clipped-area-opacity: 50%; }
     body:not(.normal)::after { content: var(--fake-content); display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--shadow-bg); z-index: 99999999; pointer-events: none; overflow: hidden; mask-image: radial-gradient(circle var(--mask-size) at var(--hole-x) var(--hole-y), #ffffff00 10%, #ffffffff 100%); mask-repeat: no-repeat; mask-composite: exclude; backdrop-filter: var(--shadow-filter); transition all 0.2s; }
@@ -139,7 +140,7 @@
 	}
 
 	function generateCurrentClipPath() {
-		const player = document.querySelector("#html5video");
+		const player = document.querySelector(videoID);
 		if (player) {
 			const { clientWidth: vw, clientHeight: vh } = document.body;
 			const { x, y, right, bottom } = player.getBoundingClientRect();
